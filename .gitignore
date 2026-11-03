@@ -1,0 +1,14 @@
+#Secrets
+.env
+
+#Python Packages insalled by uv; rebuiilt from lockfile
+.venv/
+
+#Compiled python files; regenerated automatically
+__pycache__/
+
+#Private working notes; kept on this machine only
+CLAUDE.md
+PROGRESS.md
+DECISIONS.md
+ROADMAP.md
