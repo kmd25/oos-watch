@@ -7,6 +7,9 @@
 #Compiled python files; regenerated automatically
 __pycache__/
 
+#Raw API responses; they contain the carrier's name and address
+data/samples/
+
 #Private working notes; kept on this machine only
 CLAUDE.md
 PROGRESS.md
