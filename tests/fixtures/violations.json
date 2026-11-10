@@ -1,0 +1,37 @@
+[
+  {
+    "insp_violation_id": "1",
+    "inspection_id": "1",
+    "seq_no": "1",
+    "part_no": "393",
+    "part_no_section": "75(c)",
+    "insp_viol_unit": "1",
+    "insp_unit_id": "500",
+    "out_of_service_indicator": "Y",
+    "viol_code": "393.75C",
+    "viol_desc": "Tire, other tread depth less than 2/32 of inch"
+  },
+  {
+    "insp_violation_id": "2",
+    "inspection_id": "1",
+    "seq_no": "2",
+    "part_no": "395",
+    "part_no_section": "8(e)",
+    "insp_viol_unit": "D",
+    "out_of_service_indicator": "N",
+    "viol_code": "395.8E",
+    "viol_desc": "False report of driver's record of duty status",
+    "citation_number": "00123"
+  },
+  {
+    "insp_violation_id": "3",
+    "inspection_id": "2",
+    "seq_no": "1",
+    "part_no": "391",
+    "part_no_section": "41(a)",
+    "insp_viol_unit": "D",
+    "out_of_service_indicator": "N",
+    "viol_code": "391.41A",
+    "viol_desc": "Driver not in possession of medical certificate"
+  }
+]

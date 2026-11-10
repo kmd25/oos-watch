@@ -1,0 +1,41 @@
+[
+  {
+    "inspection_id": "1",
+    "dot_number": "9999999",
+    "report_state": "TX",
+    "report_number": "TX0000000001",
+    "insp_date": "20260115",
+    "insp_start_time": "0930",
+    "insp_end_time": "1015",
+    "insp_level_id": "1",
+    "location_desc": "TEST SCALE HOUSE",
+    "county_code_state": "TX",
+    "post_acc_ind": "N",
+    "gross_comb_veh_wt": "80000",
+    "viol_total": "2",
+    "oos_total": "1",
+    "driver_viol_total": "1",
+    "driver_oos_total": "0",
+    "vehicle_viol_total": "1",
+    "vehicle_oos_total": "1",
+    "hazmat_viol_total": "0",
+    "hazmat_oos_total": "0",
+    "insp_carrier_name": "FAKE TEST CARRIER"
+  },
+  {
+    "inspection_id": "2",
+    "dot_number": "9999999",
+    "report_state": "OK",
+    "report_number": "0000000002",
+    "insp_date": "20260203",
+    "insp_level_id": "3",
+    "viol_total": "1",
+    "oos_total": "0",
+    "driver_viol_total": "1",
+    "driver_oos_total": "0",
+    "vehicle_viol_total": "0",
+    "vehicle_oos_total": "0",
+    "hazmat_viol_total": "0",
+    "hazmat_oos_total": "0"
+  }
+]

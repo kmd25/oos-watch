@@ -1,0 +1,43 @@
+name: tests
+
+# Run on every push to any branch, and on pull requests.
+on:
+  push:
+  pull_request:
+
+# The job only needs to read the code.
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    # A throwaway Postgres that exists only for this run. Same major version as docker-compose.yml.
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: oos
+          POSTGRES_PASSWORD: ci-only-password
+          POSTGRES_DB: oos_watch
+        ports:
+          - 5432:5432
+        # Wait until Postgres accepts connections before the steps start.
+        options: >-
+          --health-cmd "pg_isready -U oos -d oos_watch"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      # Not a secret: this database is empty, private to the run, and destroyed afterwards.
+      DATABASE_URL: postgresql://oos:ci-only-password@localhost:5432/oos_watch
+
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
+      # --locked fails if uv.lock is out of date instead of quietly changing versions.
+      - run: uv sync --locked
+      - run: uv run python db/migrate.py
+      - run: uv run pytest
