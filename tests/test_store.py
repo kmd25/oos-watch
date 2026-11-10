@@ -79,3 +79,22 @@ def test_violation_without_its_inspection_is_rejected(conn, inspections, violati
 
     with pytest.raises(psycopg.errors.ForeignKeyViolation):
         store.save(conn, [], violations, sms, TODAY)
+
+
+def test_national_counts_are_refreshed_not_duplicated(conn):
+    counts = {
+        "period_start": date(1990, 1, 1),
+        "period_end": date(1991, 12, 31),
+        "driver_inspections": 100,
+        "driver_oos_inspections": 6,
+        "vehicle_inspections": 80,
+        "vehicle_oos_inspections": 20,
+    }
+    store.save_national(conn, counts)
+    store.save_national(conn, {**counts, "driver_oos_inspections": 7})
+
+    stored = conn.execute(
+        "select count(*), max(driver_oos_inspections) from national_averages where period_end = %s",
+        (date(1991, 12, 31),),
+    ).fetchone()
+    assert stored == (1, 7)

@@ -31,3 +31,14 @@ with psycopg.connect(os.environ["DATABASE_URL"], autocommit=True) as conn:
             f"carrier {position} of {len(carriers)}: "
             f"{len(inspections)} inspections, {len(violations)} violations, {len(sms)} SMS rows"
         )
+
+    # Nationwide figures for comparison. Refreshed on every run because inspections
+    # keep arriving for weeks after they happen.
+    period_start, period_end = fmcsa.last_24_full_months(date.today())
+    national = fmcsa.fetch_national_counts(period_start, period_end)
+    store.save_national(conn, national)
+    print(
+        f"national {period_start} to {period_end}: "
+        f"driver {national['driver_oos_inspections']} of {national['driver_inspections']}, "
+        f"vehicle {national['vehicle_oos_inspections']} of {national['vehicle_inspections']}"
+    )

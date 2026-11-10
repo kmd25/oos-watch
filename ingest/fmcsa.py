@@ -3,6 +3,8 @@
 Nothing here cleans or stores data; these functions return rows exactly as the API sends them.
 """
 
+from datetime import timedelta
+
 import requests
 
 BASE_URL = "https://data.transportation.gov/resource"
@@ -12,6 +14,11 @@ SMS = "4y6x-dmck"
 
 PAGE_SIZE = 1000  # rows per request; also the API's own default
 ID_BATCH_SIZE = 100  # inspection IDs per violations request, to keep the URL short
+
+# Which inspection levels count as a driver inspection and as a vehicle inspection.
+# Level 3 is driver-only and level 5 (terminal) is vehicle-only.
+DRIVER_LEVELS = "'1', '2', '3', '6'"
+VEHICLE_LEVELS = "'1', '2', '5', '6'"
 
 
 def fetch_all(dataset, filters, order):
@@ -54,3 +61,35 @@ def fetch_violations(inspection_ids):
 def fetch_sms(dot_number):
     check_digits(dot_number)
     return fetch_all(SMS, {"dot_number": dot_number}, "dot_number")
+
+
+def last_24_full_months(today):
+    """The 24 complete calendar months before `today`: (first day, last day)."""
+    start_of_this_month = today.replace(day=1)
+    period_start = start_of_this_month.replace(year=start_of_this_month.year - 2)
+    period_end = start_of_this_month - timedelta(days=1)
+    return period_start, period_end
+
+
+def count(dataset, where):
+    """Ask the API to count matching rows itself, instead of sending them all to us."""
+    params = {"$select": "count(*) as n", "$where": where}
+    response = requests.get(f"{BASE_URL}/{dataset}.json", params=params, timeout=120)
+    response.raise_for_status()
+    return int(response.json()[0]["n"])
+
+
+def fetch_national_counts(period_start, period_end):
+    """Count every carrier's inspections in the period, and how many had an OOS violation."""
+    # insp_date is text in YYYYMMDD form, which sorts the same way as the dates themselves.
+    dates = f"insp_date between '{period_start:%Y%m%d}' and '{period_end:%Y%m%d}'"
+    driver = f"{dates} and insp_level_id in ({DRIVER_LEVELS})"
+    vehicle = f"{dates} and insp_level_id in ({VEHICLE_LEVELS})"
+    return {
+        "period_start": period_start,
+        "period_end": period_end,
+        "driver_inspections": count(INSPECTIONS, driver),
+        "driver_oos_inspections": count(INSPECTIONS, f"{driver} and driver_oos_total > '0'"),
+        "vehicle_inspections": count(INSPECTIONS, vehicle),
+        "vehicle_oos_inspections": count(INSPECTIONS, f"{vehicle} and vehicle_oos_total > '0'"),
+    }

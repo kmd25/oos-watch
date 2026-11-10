@@ -1,5 +1,7 @@
 """Tests for the fetch code. requests.get is replaced, so nothing touches the network."""
 
+from datetime import date
+
 import pytest
 
 from ingest import fmcsa
@@ -76,3 +78,35 @@ def test_dot_number_must_be_digits(api):
     with pytest.raises(ValueError):
         fmcsa.fetch_sms("")
     assert api.calls == []
+
+
+def test_last_24_full_months():
+    assert fmcsa.last_24_full_months(date(2026, 11, 10)) == (date(2024, 11, 1), date(2026, 10, 31))
+    assert fmcsa.last_24_full_months(date(2026, 1, 1)) == (date(2024, 1, 1), date(2025, 12, 31))
+    assert fmcsa.last_24_full_months(date(2026, 3, 31)) == (date(2024, 3, 1), date(2026, 2, 28))
+
+
+def test_national_counts_ask_the_api_to_count(monkeypatch):
+    wheres = []
+
+    def fake_get(url, params, timeout):
+        wheres.append(params["$where"])
+        return FakeResponse([{"n": str(len(wheres))}])
+
+    monkeypatch.setattr(fmcsa.requests, "get", fake_get)
+
+    counts = fmcsa.fetch_national_counts(date(2024, 11, 1), date(2026, 10, 31))
+
+    assert counts == {
+        "period_start": date(2024, 11, 1),
+        "period_end": date(2026, 10, 31),
+        "driver_inspections": 1,
+        "driver_oos_inspections": 2,
+        "vehicle_inspections": 3,
+        "vehicle_oos_inspections": 4,
+    }
+    assert wheres[0] == "insp_date between '20241101' and '20261031' and insp_level_id in ('1', '2', '3', '6')"
+    assert wheres[3] == (
+        "insp_date between '20241101' and '20261031' and insp_level_id in ('1', '2', '5', '6')"
+        " and vehicle_oos_total > '0'"
+    )

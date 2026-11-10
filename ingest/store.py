@@ -68,3 +68,29 @@ def save(conn, inspections, violations, sms, fetched_on):
         [clean.clean_sms(row, fetched_on) for row in sms],
         track_last_seen=False,
     )
+
+
+def save_national(conn, counts):
+    """Store one period's nationwide counts; a re-run for the same period refreshes them."""
+    conn.execute(
+        """
+        insert into national_averages (
+            period_end, period_start,
+            driver_inspections, driver_oos_inspections,
+            vehicle_inspections, vehicle_oos_inspections
+        )
+        values (
+            %(period_end)s, %(period_start)s,
+            %(driver_inspections)s, %(driver_oos_inspections)s,
+            %(vehicle_inspections)s, %(vehicle_oos_inspections)s
+        )
+        on conflict (period_end) do update set
+            period_start            = excluded.period_start,
+            driver_inspections      = excluded.driver_inspections,
+            driver_oos_inspections  = excluded.driver_oos_inspections,
+            vehicle_inspections     = excluded.vehicle_inspections,
+            vehicle_oos_inspections = excluded.vehicle_oos_inspections,
+            computed_at             = now()
+        """,
+        counts,
+    )
