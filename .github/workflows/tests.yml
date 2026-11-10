@@ -36,7 +36,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v10
+      # This action publishes exact version tags only (there is no moving v10 tag).
+      - uses: astral-sh/setup-uv@v10.3.3
       # --locked fails if uv.lock is out of date instead of quietly changing versions.
       - run: uv sync --locked
       - run: uv run python db/migrate.py
