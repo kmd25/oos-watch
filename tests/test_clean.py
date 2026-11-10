@@ -48,6 +48,14 @@ def test_violation_out_of_service_becomes_boolean(violations):
     assert clean.clean_violation(violations[1])["out_of_service"] is False
 
 
+def test_out_of_service_z_means_yes_and_missing_means_unknown(violations):
+    violations[0]["out_of_service_indicator"] = "Z"
+    del violations[1]["out_of_service_indicator"]
+
+    assert clean.clean_violation(violations[0])["out_of_service"] is True
+    assert clean.clean_violation(violations[1])["out_of_service"] is None
+
+
 def test_unexpected_out_of_service_value_fails(violations):
     violations[0]["out_of_service_indicator"] = "X"
 

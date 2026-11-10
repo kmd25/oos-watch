@@ -26,7 +26,8 @@ SMS_COUNT_FIELDS = [
     "vehicle_oos_insp_total",
 ]
 
-OUT_OF_SERVICE = {"Y": True, "N": False}
+# FMCSA's data dictionary: "Z = Driver Yes, Y = Yes or N = No". A missing indicator is unknown.
+OUT_OF_SERVICE = {"Y": True, "Z": True, "N": False, None: None}
 
 
 def to_int(value):
@@ -73,8 +74,8 @@ def clean_violation(row):
         "part_no_section": row.get("part_no_section"),
         "insp_viol_unit": row["insp_viol_unit"],
         "insp_unit_id": to_int(row.get("insp_unit_id")),
-        # A value other than Y or N raises KeyError rather than being guessed at.
-        "out_of_service": OUT_OF_SERVICE[row["out_of_service_indicator"]],
+        # A value the dictionary doesn't list raises KeyError rather than being guessed at.
+        "out_of_service": OUT_OF_SERVICE[row.get("out_of_service_indicator")],
         "citation_number": row.get("citation_number"),
         "raw": row,
     }

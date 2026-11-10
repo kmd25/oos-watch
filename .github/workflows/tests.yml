@@ -35,8 +35,8 @@ jobs:
       DATABASE_URL: postgresql://oos:ci-only-password@localhost:5432/oos_watch
 
     steps:
-      - uses: actions/checkout@v5
-      - uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
       # --locked fails if uv.lock is out of date instead of quietly changing versions.
       - run: uv sync --locked
       - run: uv run python db/migrate.py
