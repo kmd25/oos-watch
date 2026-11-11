@@ -206,6 +206,7 @@ def trends(conn=Depends(get_conn), dot_number=Depends(get_dot_number)):
             m.month,
             count(i.inspection_id) as inspections,
             coalesce(sum(i.viol_total), 0) as violations,
+            count(*) filter (where i.oos_total > 0) as oos_inspections,
             count(*) filter (where i.insp_level_id = any(%(driver_levels)s))
                 as driver_inspections,
             count(*) filter (where i.insp_level_id = any(%(driver_levels)s) and i.driver_oos_total > 0)

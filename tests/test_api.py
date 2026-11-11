@@ -165,6 +165,7 @@ def test_trends_has_a_row_for_every_month_including_empty_ones(client, conn):
     # Three months ago, two months ago (empty), last month, this month (empty).
     assert [row["inspections"] for row in rows] == [2, 0, 1, 0]
     assert [row["violations"] for row in rows] == [5, 0, 2, 0]
+    assert [row["oos_inspections"] for row in rows] == [1, 0, 1, 0]
     assert [row["month"][8:] for row in rows] == ["01"] * 4
     first, empty, last, _ = rows
     assert (first["driver_inspections"], first["driver_oos_inspections"]) == (2, 0)

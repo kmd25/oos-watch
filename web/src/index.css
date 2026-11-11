@@ -1,0 +1,52 @@
+/* Tailwind generates only the utility classes our components actually use. */
+@import 'tailwindcss';
+
+/* The app's colors, defined once. The dark set applies when the device is in dark mode. */
+:root {
+  /* Lets the browser draw its own parts (scrollbars, buttons) to match light or dark mode. */
+  color-scheme: light dark;
+  --page: #f9f9f7;
+  --surface: #fcfcfb;
+  --ink: #0b0b0b;
+  --ink-secondary: #52514e;
+  --border: rgba(11, 11, 11, 0.1);
+  --good: #006300;
+  --critical: #d03b3b;
+  --grid: #e1e0d9;
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --page: #0d0d0d;
+    --surface: #1a1a19;
+    --ink: #f0efec;
+    --ink-secondary: #c3c2b7;
+    --border: rgba(255, 255, 255, 0.1);
+    --good: #0ca30c;
+    --critical: #d03b3b;
+    --grid: #2c2c2a;
+    --series-1: #3987e5;
+    --series-2: #d95926;
+  }
+}
+
+/* Turn those colors into Tailwind classes: bg-page, text-ink, border-border, text-good... */
+@theme inline {
+  --color-page: var(--page);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-ink-secondary: var(--ink-secondary);
+  --color-border: var(--border);
+  --color-good: var(--good);
+  --color-critical: var(--critical);
+  --color-grid: var(--grid);
+  --color-series-1: var(--series-1);
+  --color-series-2: var(--series-2);
+}
+
+body {
+  background: var(--page);
+  color: var(--ink);
+}
