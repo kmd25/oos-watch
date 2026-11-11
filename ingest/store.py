@@ -70,6 +70,17 @@ def save(conn, inspections, violations, sms, fetched_on):
     )
 
 
+def save_crashes(conn, crashes):
+    """Clean and store one carrier's raw crash rows. The carrier must already be in `carriers`."""
+    upsert(
+        conn,
+        "crashes",
+        ["crash_id"],
+        clean.dedupe([clean.clean_crash(row) for row in crashes], "crash_id"),
+        track_last_seen=True,
+    )
+
+
 def save_national(conn, counts):
     """Store one period's nationwide counts; a re-run for the same period refreshes them."""
     conn.execute(

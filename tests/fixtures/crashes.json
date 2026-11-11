@@ -1,0 +1,31 @@
+[
+  {
+    "crash_id": "1",
+    "dot_number": "9999999",
+    "report_state": "TX",
+    "report_number": "TX0000000001",
+    "report_seq_no": "1",
+    "report_date": "20260310",
+    "report_time": "0117",
+    "city": "TESTVILLE",
+    "location": "I-00",
+    "fatalities": "0",
+    "injuries": "1",
+    "tow_away": "Y",
+    "hazmat_released": "N",
+    "federal_recordable": "Y",
+    "vehicles_in_accident": "2",
+    "vehicle_identification_number": "FAKEVIN0000000001",
+    "crash_carrier_name": "FAKE TEST CARRIER"
+  },
+  {
+    "crash_id": "2",
+    "dot_number": "9999999",
+    "report_state": "OK",
+    "report_number": "OK0000000002",
+    "report_seq_no": "1",
+    "report_date": "20250704",
+    "fatalities": "0",
+    "injuries": "0"
+  }
+]

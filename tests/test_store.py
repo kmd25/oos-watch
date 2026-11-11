@@ -98,3 +98,14 @@ def test_national_counts_are_refreshed_not_duplicated(conn):
         (date(1991, 12, 31),),
     ).fetchone()
     assert stored == (1, 7)
+
+
+def test_crashes_are_stored_once_however_often_they_are_saved(conn, crashes):
+    store.add_carrier(conn, DOT)
+    store.save_crashes(conn, crashes)
+    store.save_crashes(conn, crashes)
+
+    stored = conn.execute(
+        "select count(*), sum(injuries) from crashes where dot_number = %s", (DOT,)
+    ).fetchone()
+    assert stored == (2, 1)

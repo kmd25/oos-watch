@@ -33,6 +33,11 @@ def sms():
 
 
 @pytest.fixture
+def crashes():
+    return load("crashes")
+
+
+@pytest.fixture
 def conn():
     """A database connection whose changes are thrown away after each test."""
     url = os.environ.get("DATABASE_URL")

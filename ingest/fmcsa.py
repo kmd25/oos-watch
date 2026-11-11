@@ -11,14 +11,16 @@ BASE_URL = "https://data.transportation.gov/resource"
 INSPECTIONS = "fx4q-ay7w"
 VIOLATIONS = "876r-jsdb"
 SMS = "4y6x-dmck"
+CRASHES = "aayw-vxb3"
 
 PAGE_SIZE = 1000  # rows per request; also the API's own default
 ID_BATCH_SIZE = 100  # inspection IDs per violations request, to keep the URL short
 
 # Which inspection levels count as a driver inspection and as a vehicle inspection.
 # Level 3 is driver-only and level 5 (terminal) is vehicle-only.
-DRIVER_LEVELS = "'1', '2', '3', '6'"
-VEHICLE_LEVELS = "'1', '2', '5', '6'"
+# The API's SQL uses these same two tuples, so the rule lives in one place.
+DRIVER_LEVELS = (1, 2, 3, 6)
+VEHICLE_LEVELS = (1, 2, 5, 6)
 
 
 def fetch_all(dataset, filters, order):
@@ -63,6 +65,11 @@ def fetch_sms(dot_number):
     return fetch_all(SMS, {"dot_number": dot_number}, "dot_number")
 
 
+def fetch_crashes(dot_number):
+    check_digits(dot_number)
+    return fetch_all(CRASHES, {"dot_number": dot_number}, "crash_id")
+
+
 def last_24_full_months(today):
     """The 24 complete calendar months before `today`: (first day, last day)."""
     start_of_this_month = today.replace(day=1)
@@ -79,12 +86,17 @@ def count(dataset, where):
     return int(response.json()[0]["n"])
 
 
+def quoted(levels):
+    """The source stores levels as text, so (1, 2) becomes "'1', '2'" for its query language."""
+    return ", ".join(f"'{level}'" for level in levels)
+
+
 def fetch_national_counts(period_start, period_end):
     """Count every carrier's inspections in the period, and how many had an OOS violation."""
     # insp_date is text in YYYYMMDD form, which sorts the same way as the dates themselves.
     dates = f"insp_date between '{period_start:%Y%m%d}' and '{period_end:%Y%m%d}'"
-    driver = f"{dates} and insp_level_id in ({DRIVER_LEVELS})"
-    vehicle = f"{dates} and insp_level_id in ({VEHICLE_LEVELS})"
+    driver = f"{dates} and insp_level_id in ({quoted(DRIVER_LEVELS)})"
+    vehicle = f"{dates} and insp_level_id in ({quoted(VEHICLE_LEVELS)})"
     return {
         "period_start": period_start,
         "period_end": period_end,

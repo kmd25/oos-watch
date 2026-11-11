@@ -83,3 +83,22 @@ def test_dedupe_keeps_the_later_row():
     rows = [{"id": "1", "v": "old"}, {"id": "2", "v": "b"}, {"id": "1", "v": "new"}]
 
     assert clean.dedupe(rows, "id") == [{"id": "1", "v": "new"}, {"id": "2", "v": "b"}]
+
+
+def test_crash_text_becomes_typed_values(crashes):
+    row = clean.clean_crash(crashes[0])
+
+    assert row["crash_id"] == 1
+    assert row["report_date"] == date(2026, 3, 10)
+    assert row["report_time"] == time(1, 17)
+    assert (row["fatalities"], row["injuries"], row["vehicles_in_accident"]) == (0, 1, 2)
+    assert (row["tow_away"], row["hazmat_released"]) == (True, False)
+    assert row["vin"] == "FAKEVIN0000000001"
+
+
+def test_crash_with_only_the_required_fields(crashes):
+    row = clean.clean_crash(crashes[1])
+
+    assert row["report_time"] is None
+    assert row["tow_away"] is None
+    assert row["vin"] is None

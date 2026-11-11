@@ -29,6 +29,9 @@ SMS_COUNT_FIELDS = [
 # FMCSA's data dictionary: "Z = Driver Yes, Y = Yes or N = No". A missing indicator is unknown.
 OUT_OF_SERVICE = {"Y": True, "Z": True, "N": False, None: None}
 
+# Crash flags are "Y" or "N", and are sometimes left empty.
+YES_NO = {"Y": True, "N": False, None: None}
+
 
 def to_int(value):
     return None if value is None else int(value)
@@ -87,6 +90,28 @@ def clean_sms(row, fetched_on):
         "dot_number": row["dot_number"],
         "fetched_on": fetched_on,
         **{field: to_int(row.get(field)) for field in SMS_COUNT_FIELDS},
+        "raw": row,
+    }
+
+
+def clean_crash(row):
+    return {
+        "crash_id": int(row["crash_id"]),
+        "dot_number": row["dot_number"],
+        "report_state": row["report_state"],
+        "report_number": row["report_number"],
+        "report_seq_no": int(row["report_seq_no"]),
+        "report_date": to_date(row["report_date"]),
+        "report_time": to_time(row.get("report_time")),
+        "city": row.get("city"),
+        "location": row.get("location"),
+        "fatalities": int(row["fatalities"]),
+        "injuries": int(row["injuries"]),
+        "tow_away": YES_NO[row.get("tow_away")],
+        "hazmat_released": YES_NO[row.get("hazmat_released")],
+        "federal_recordable": YES_NO[row.get("federal_recordable")],
+        "vehicles_in_accident": to_int(row.get("vehicles_in_accident")),
+        "vin": row.get("vehicle_identification_number"),
         "raw": row,
     }
 

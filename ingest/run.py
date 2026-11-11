@@ -21,15 +21,18 @@ with psycopg.connect(os.environ["DATABASE_URL"], autocommit=True) as conn:
         inspections = fmcsa.fetch_inspections(dot_number)
         violations = fmcsa.fetch_violations([row["inspection_id"] for row in inspections])
         sms = fmcsa.fetch_sms(dot_number)
+        crashes = fmcsa.fetch_crashes(dot_number)
 
         # One carrier's rows are stored together or not at all.
         with conn.transaction():
             store.save(conn, inspections, violations, sms, date.today())
+            store.save_crashes(conn, crashes)
 
         # Never print the DOT number: CI logs for a public repo are public.
         print(
             f"carrier {position} of {len(carriers)}: "
-            f"{len(inspections)} inspections, {len(violations)} violations, {len(sms)} SMS rows"
+            f"{len(inspections)} inspections, {len(violations)} violations, "
+            f"{len(sms)} SMS rows, {len(crashes)} crash rows"
         )
 
     # Nationwide figures for comparison. Refreshed on every run because inspections
