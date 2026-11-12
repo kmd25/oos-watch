@@ -72,9 +72,18 @@ export type Crash = {
   possible_duplicate: boolean // same vehicle, same day as another row
 }
 
-/** GET a path from our API and return the parsed JSON, or throw if the request failed. */
-export async function getJson<T>(path: string): Promise<T> {
-  const response = await fetch(`/api${path}`)
+/** Asks Clerk for the current session token; null when nobody is signed in. */
+export type GetToken = () => Promise<string | null>
+
+/**
+ * GET a path from our API and return the parsed JSON, or throw if the request failed.
+ * The session token goes in the Authorization header so the API knows who is asking.
+ */
+export async function getJson<T>(path: string, getToken: GetToken): Promise<T> {
+  const token = await getToken()
+  const response = await fetch(`/api${path}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
   if (!response.ok) {
     throw new Error(`${path} returned ${response.status}`)
   }

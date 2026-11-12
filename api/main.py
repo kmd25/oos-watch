@@ -9,6 +9,7 @@ import psycopg
 from fastapi import Depends, FastAPI
 from psycopg.rows import dict_row
 
+from api.auth import get_claims
 from ingest.fmcsa import DRIVER_LEVELS, VEHICLE_LEVELS
 
 app = FastAPI(title="OOS Watch")
@@ -20,8 +21,12 @@ def get_conn():
         yield conn
 
 
-def get_dot_number():
-    """Whose data to show. Until logins exist (Step 4) this is the carrier named in .env."""
+def get_dot_number(claims=Depends(get_claims)):
+    """Whose data to show. Depending on get_claims means every endpoint needs a valid login.
+
+    For now every signed-in user sees the carrier named in .env; the next step looks up
+    the company that the user's organization belongs to.
+    """
     return os.environ["CARRIER_DOT_NUMBER"]
 
 
@@ -46,6 +51,13 @@ def with_rates(counts):
         "driver": block("driver"),
         "vehicle": block("vehicle"),
     }
+
+
+@app.get("/whoami")
+def whoami(claims=Depends(get_claims)):
+    """Who the API thinks is calling: the user and their active organization, if any."""
+    # "sub" (subject) is the user's ID. "o" is only present when an organization is active.
+    return {"user_id": claims["sub"], "organization_id": claims.get("o", {}).get("id")}
 
 
 @app.get("/summary")

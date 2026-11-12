@@ -5,6 +5,7 @@ requires-python = ">=3.14"
 dependencies = [
     "fastapi>=0.162.4",
     "psycopg[binary]>=3.3.8",
+    "pyjwt[crypto]>=2.15.1",
     "requests>=2.34.2",
     "uvicorn>=0.54.0",
 ]
